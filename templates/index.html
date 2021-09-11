@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+{% block main %}
+    <div>
+        <table class="table table-responsive table-striped text-xsmall">
+            <thead>
+                <tr>
+                    <th>
+                        <div class="th-inner ">Lot ID</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id="lot_id" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th-inner ">Pickup</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input type="text" class="form-control">
+{#                               <input id="pickup" type="search" class="form-control form-control-sm search-input" placeholder="" value="">#}
+                           </div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th-inner ">Delivery</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id="delivery" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th-inner ">Truck Type</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                                <select id="type" class="custom-select custom-select-sm">
+                                    <option selected>Select</option>
+                                    <option value="1">One</option>
+                                    <option value="2">Two</option>
+                                    <option value="3">Three</option>
+                                </select>
+                           </div>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="th-inner ">Origin</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id="origin" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                     </th>
+                    <th>
+                        <div class="th-inner ">DH-O</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id="dh-o" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                     </th>
+                    <th>
+                        <div class="th-inner ">Destination</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id = "destination" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                     </th>
+                    <th>
+                        <div class="th-inner ">DH-D</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id = "dh-d" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                     </th>
+                    <th>
+                        <div class="th-inner ">Contact</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id="contact" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                     </th>
+                    <th>
+                        <div class="th-inner ">Weight</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id="weight" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                     </th>
+                    <th>
+                        <div class="th-inner ">Rate</div>
+                        <div class="fht-cell">
+                           <div class="filter-control">
+                               <input id="rate" type="search" class="form-control form-control-sm search-input" placeholder="" value="">
+                           </div>
+                        </div>
+                    </th>
+
+                </tr>
+            </thead>
+{#            <tfoot>#}
+{#                <tr>#}
+{#                    <td colspan="4"></td>#}
+{#                    <td>{{ grandTotal|usd() }}</td>#}
+{#                </tr>#}
+{#            </tfoot>#}
+            <tbody>
+                {% for load in loads["loads"] %}
+                <tr>
+                    <td>{{load["lot_id"]}}</td>
+                    <td>{{load["pickup"]|date}}</td>
+                    <td>{{load["delivery"]|date}}</td>
+                    <td>{{load["truck_type"]}}</td>
+                    <td>{{load["origin"]}}</td>
+                    <td>{{load["dh-o"]}}</td>
+                    <td>{{load["destination"]}}</td>
+                    <td>{{load["dh-d"]}}</td>
+                    <td>{{load["contact"]["tel"]}}, {{load["contact"]["email"]}}</td>
+                    <td>{{load["weight"]}}</td>
+                    <td>{{load["rate"]|usd}}</td>
+                </tr>
+                {% endfor %}
+
+            </tbody>
+        </table>
+    </div>
+    <script src="../static/indexscript.js"></script>
+<script   src="https://code.jquery.com/jquery-3.6.0.js"   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="   crossorigin="anonymous"></script>{% endblock %}

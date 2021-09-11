@@ -1,0 +1,79 @@
+nav .navbar-brand
+{
+    /* size for brand */
+    font-size: xx-large;
+}
+
+/* Colors for brand */
+nav .navbar-brand .blue
+{
+    color: #2377A4;
+}
+nav .navbar-brand .gray
+{
+    color: #9CB2CE;
+}
+nav .navbar-brand .black
+{
+    color: #101010;
+}
+
+main .form-control
+{
+    /* Center form controls */
+    display: inline-block;
+
+    /* Override Bootstrap's 100% width for form controls */
+    width: auto;
+}
+
+main
+{
+    /* Scroll horizontally as needed */
+    overflow-x: auto;
+
+    /* Center contents */
+    text-align: center;
+    /*min-width: fit-content;*/
+}
+
+main img
+{
+    /* Constrain images on small screens */
+    max-width: 100%;
+}
+table{
+    text-align: left;
+}
+table tfoot{
+    font-weight: bold;
+
+}
+table thead{
+    font-size: 12px;
+}
+table tbody{
+    font-size: 11px;
+}
+
+th .th-inner{
+    white-space: nowrap
+}
+.table thead th{
+    padding: 5px;
+
+}
+.search-input, .custom-select {
+    font-size: smaller
+}
+
+#lot_id, #pickup, #delivery{
+    max-width:110px;
+    font-size: smaller
+}
+#dh-d, #dh-o{
+    max-width:60px;
+}
+#weight, #rate{
+    max-width: 90px;
+}

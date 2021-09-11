@@ -1,0 +1,32 @@
+{
+    "loads": [
+        {
+            "lot_id": 31231343 ,
+            "truck_type": "Van (V)" ,
+            "origin": "Los Angeles, CA, USA" ,
+            "DH-O": 250 ,
+            "destination": "Boston, MA, USA" ,
+            "DH-D": 200 ,
+            "contact": {
+                "tel": "303-34434" ,
+                "email": "test@test.com"
+            } ,
+            "weight": 23000 ,
+            "rate": 2800
+        } ,
+        {
+            "lot_id": 3123123 ,
+            "truck_type": "Van (V)" ,
+            "origin": "Los Angeles, CA, USA" ,
+            "DH-O": 250 ,
+            "destination": "Boston, MA, USA" ,
+            "DH-D": 200 ,
+            "contact": {
+                "tel": "303-34434" ,
+                "email": "test@test.com"
+            } ,
+            "weight": 30000 ,
+            "rate": 5700
+        }
+    ]
+}
