@@ -77,3 +77,6 @@ th .th-inner{
 #weight, #rate{
     max-width: 90px;
 }
+.card-body{
+    min-height: 320px;
+}

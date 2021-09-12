@@ -51,18 +51,50 @@ if not os.environ.get("API_KEY"):
 def index():
     """Show portfolio of stocks"""
     load_board = {"loads":[]}
+    maxepoch = 32525679833000
+    maxdh = 30000
+    truck_type = [i for i in range(65)]
+    ttype = tuple(truck_type)
     if len(request.args) > 1:
         rows = db.execute(
             "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id "
             "where lot_id like ? AND "
+            "pickup <= ? AND "
+            "delivery <= ? AND "
             "origin like ? AND "
-            "destination like ? ;"
+            "dh_o <= ? AND "
+            "destination like ? AND "
+            "dh_d <= ? AND "
+            "(tel like ? OR email like ?) AND "
+            "weight <= ? AND "
+            "rate <= ?;"
             , [
-                '%' + str(request.args.get("lot_id")) + '%'
-                , '%' + str(request.args.get("origin")) + '%'
-                , '%' + str(request.args.get("destination")) + '%'
+                '%' + "" if str(request.args.get("lot_id")) == "NaN" else str(request.args.get("lot_id")) + '%'
+                , maxepoch if request.args.get("pickup") == "NaN" else int(request.args.get("pickup"))*1000
+                , maxepoch if request.args.get("delivery") == "NaN" else int(request.args.get("delivery"))*1000
+                , '%' + ("" if str(request.args.get("origin")) == "NaN" else str(request.args.get("origin"))) + '%'
+                , maxdh if request.args.get("dh-o") == "NaN" else request.args.get("dh-o")
+                , '%' + ("" if str(request.args.get("destination")) == "NaN" else str(request.args.get("destination"))) + '%'
+                , maxdh if request.args.get("dh-d") == "NaN" else request.args.get("dh-d")
+                , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
+                , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
+                , maxdh if request.args.get("weight") == "NaN" else request.args.get("weight")
+                , maxdh if request.args.get("rate") == "NaN" else request.args.get("rate")
                ]
         ).fetchall()
+        print([
+                '%' + "" if str(request.args.get("lot_id")) == "NaN" else str(request.args.get("lot_id")) + '%'
+                , maxepoch if request.args.get("pickup") == "NaN" else int(request.args.get("pickup"))*1000
+                , maxepoch if request.args.get("delivery") == "NaN" else int(request.args.get("delivery"))*1000
+                , '%' + ("" if str(request.args.get("origin")) == "NaN" else str(request.args.get("origin"))) + '%'
+                , maxdh if request.args.get("dh-o") == "NaN" else request.args.get("dh-o")
+                , '%' + ("" if str(request.args.get("destination")) == "NaN" else str(request.args.get("destination"))) + '%'
+                , maxdh if request.args.get("dh-d") == "NaN" else request.args.get("dh-d")
+                , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
+                , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
+                , maxdh if request.args.get("weight") == "NaN" else request.args.get("weight")
+                , maxdh if request.args.get("rate") == "NaN" else request.args.get("rate")
+               ])
     else:
         rows = db.execute("SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id ;").fetchall()
     for i in range(len(rows)):

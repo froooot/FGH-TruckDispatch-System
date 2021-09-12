@@ -9,9 +9,8 @@ $("input").keypress(function(event){
 function filter() {
     let data = {
         "lot_id": $("#lot_id").val(),
-        "pickup": $("#pickup").val(),
-        "delivery": $("#delivery").val(),
-        "truck_type": $("#truck_type").val(),
+        "pickup": new Date($("#pickup").val()).getTime()/1000,
+        "delivery": new Date($("#delivery").val()).getTime()/1000,
         "origin": $("#origin").val(),
         "dh-o": $("#dh-o").val(),
         "destination": $("#destination").val(),
@@ -39,6 +38,3 @@ function generateUrl(url, params) {
     }
     return url;
 }
-
-$('#sandbox-container input').datepicker({
-});
