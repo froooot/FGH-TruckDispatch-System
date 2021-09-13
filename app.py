@@ -1,4 +1,3 @@
-import json
 import os
 import sqlite3
 # from cs50 import SQL
@@ -53,8 +52,6 @@ def index():
     load_board = {"loads":[]}
     maxepoch = 32525679833000
     maxdh = 30000
-    truck_type = [i for i in range(65)]
-    ttype = tuple(truck_type)
     if len(request.args) > 1:
         rows = db.execute(
             "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id "
@@ -82,19 +79,6 @@ def index():
                 , maxdh if request.args.get("rate") == "NaN" else request.args.get("rate")
                ]
         ).fetchall()
-        print([
-                '%' + "" if str(request.args.get("lot_id")) == "NaN" else str(request.args.get("lot_id")) + '%'
-                , maxepoch if request.args.get("pickup") == "NaN" else int(request.args.get("pickup"))*1000
-                , maxepoch if request.args.get("delivery") == "NaN" else int(request.args.get("delivery"))*1000
-                , '%' + ("" if str(request.args.get("origin")) == "NaN" else str(request.args.get("origin"))) + '%'
-                , maxdh if request.args.get("dh-o") == "NaN" else request.args.get("dh-o")
-                , '%' + ("" if str(request.args.get("destination")) == "NaN" else str(request.args.get("destination"))) + '%'
-                , maxdh if request.args.get("dh-d") == "NaN" else request.args.get("dh-d")
-                , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
-                , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
-                , maxdh if request.args.get("weight") == "NaN" else request.args.get("weight")
-                , maxdh if request.args.get("rate") == "NaN" else request.args.get("rate")
-               ])
     else:
         rows = db.execute("SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id ;").fetchall()
     for i in range(len(rows)):
@@ -246,7 +230,19 @@ def changepassword():
 @app.route("/profile", methods=["GET"])
 @login_required
 def profile():
-    return render_template("profile.html")
+    user = dict(db.execute("SELECT * FROM users WHERE id = ?", [session["user_id"]]).fetchone())
+    user["photo"] = user["photo"].decode('utf-8-sig')
+    print(user["photo"])
+    return render_template("profile.html", user=user)
+
+
+@app.route("/profileedit", methods=["GET", "POST"])
+@login_required
+def profileedit():
+    user = dict(db.execute("SELECT * FROM users WHERE id = ?", [session["user_id"]]).fetchone())
+    user["photo"] = user["photo"].decode('utf-8-sig')
+    print(user["photo"])
+    return render_template("profileedit.html", user=user)
 
 
 @app.route("/quote", methods=["GET", "POST"])

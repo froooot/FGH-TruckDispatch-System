@@ -7,6 +7,9 @@
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/finance.db</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
+      <driver-properties>
+        <property name="encoding" value="'UTF-8'" />
+      </driver-properties>
     </data-source>
   </component>
 </project>
