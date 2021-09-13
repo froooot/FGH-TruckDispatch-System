@@ -224,7 +224,9 @@ def changepassword():
             request.form.get("newPassword"), "sha512", 8), session["user_id"])
         return redirect("/")
     else:
-        return render_template("changepassword.html")
+        user = dict(db.execute("SELECT * FROM users WHERE id = ?", [session["user_id"]]).fetchone())
+        user["photo"] = user["photo"].decode('utf-8-sig')
+        return render_template("changepassword.html",  user=user)
 
 
 @app.route("/profile", methods=["GET"])

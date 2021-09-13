@@ -11,14 +11,14 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex flex-column align-items-center text-center">
-                            <img id="profilephoto" src="{{user["photo"]}}" class="rounded-circle" width="150" height="150">
+                            <img id="profilephoto" src="{{ user["photo"] }}" class="rounded-circle" width="150"
+                                 height="150">
                             <div class="mt-3">
-                                <h4>{{ user["firstname"] }} {{ user["lastname"] }}e</h4>
+                                <h4>{{ user["firstname"] }} {{ user["lastname"] }}</h4>
                                 <p class="text-muted font-size-sm">{{ user["bio"] }}</p>
-
                                 <div class="file-field">
                                     <div>
-                                      <input id="changephotobutton"  type="file" hidden>
+                                        <input id="changephotobutton" type="file" hidden>
                                         <label for="changephotobutton" class="btn btn-primary">Change Photo</label>
                                     </div>
                                 </div>
@@ -32,10 +32,18 @@
                     <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-sm-3">
-                                <h6 class="mb-0">Full Name</h6>
+                                <h6 class="mb-0">First Name</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                <input type="text" class="form-control" value="John Doe">
+                                <input id="firstname" type="text" class="form-control" value="{{ user["firstname"] }}">
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-sm-3">
+                                <h6 class="mb-0">Last Name</h6>
+                            </div>
+                            <div class="col-sm-9 text-secondary">
+                                <input id="lastname" type="text" class="form-control" value="{{ user["lastname"] }}">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -43,7 +51,7 @@
                                 <h6 class="mb-0">Email</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                <input type="text" class="form-control" value="john@example.com">
+                                <input id="email" type="text" class="form-control" value="{{ user["email"] }}">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -51,7 +59,7 @@
                                 <h6 class="mb-0">Phone</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                <input type="text" class="form-control" value="(239) 816-9029">
+                                <input id="phone" type="text" class="form-control" value="{{ user["phone"] }}">
                             </div>
                         </div>
                         <div class="row mb-3">
@@ -59,13 +67,13 @@
                                 <h6 class="mb-0">Bio</h6>
                             </div>
                             <div class="col-sm-9 text-secondary">
-                                <input type="text" class="form-control" value="jnlklkjhkj kjhlk kjh lk hk">
+                                <input id="bio" type="text" class="form-control" value="{{ user["bio"] }}">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-3"></div>
                             <div class="col-sm-9 text-secondary">
-                                <a class="btn btn-secondary" target="__blank" href="/profile">Beck</a>
+                                <a class="btn btn-secondary" target="__blank" href="/profile">Back</a>
                                 <input id="savedata" type="button" class="btn btn-primary px-4" value="Save Changes">
                             </div>
                         </div>
@@ -84,47 +92,47 @@
         var filterType = /^(?:image\/bmp|image\/cis\-cod|image\/gif|image\/ief|image\/jpeg|image\/jpeg|image\/jpeg|image\/pipeg|image\/png|image\/svg\+xml|image\/tiff|image\/x\-cmu\-raster|image\/x\-cmx|image\/x\-icon|image\/x\-portable\-anymap|image\/x\-portable\-bitmap|image\/x\-portable\-graymap|image\/x\-portable\-pixmap|image\/x\-rgb|image\/x\-xbitmap|image\/x\-xpixmap|image\/x\-xwindowdump)$/i;
 
         fileReader.onload = function (event) {
-          var image = new Image();
+            var image = new Image();
 
-          image.onload=function(){
-              document.getElementById("changephotobutton").src=image.src;
-              var canvas=document.createElement("canvas");
-              var context=canvas.getContext("2d");
-              canvas.width= image.width/(image.height/500);
-              canvas.height=500;
-              context.drawImage(image,
-                  0,
-                  0,
-                  image.width,
-                  image.height,
-                  0,
-                  0,
-                  canvas.width,
-                  canvas.height
-              );
+            image.onload = function () {
+                document.getElementById("changephotobutton").src = image.src;
+                var canvas = document.createElement("canvas");
+                var context = canvas.getContext("2d");
+                canvas.width = image.width / (image.height / 500);
+                canvas.height = 500;
+                context.drawImage(image,
+                    0,
+                    0,
+                    image.width,
+                    image.height,
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
 
-              document.getElementById("profilephoto").src = canvas.toDataURL();
-              {#document.getElementById("base65img").innerHTML = canvas.toDataURL();#}
-          }
-          image.src=event.target.result;
+                document.getElementById("profilephoto").src = canvas.toDataURL();
+                {#document.getElementById("base65img").innerHTML = canvas.toDataURL();#}
+            }
+            image.src = event.target.result;
         };
 
         var loadImageFile = function () {
-          var uploadImage = document.getElementById("changephotobutton");
+            var uploadImage = document.getElementById("changephotobutton");
 
-          //check and retuns the length of uploded file.
-          if (uploadImage.files.length === 0) {
-            return;
-          }
+            //check and retuns the length of uploded file.
+            if (uploadImage.files.length === 0) {
+                return;
+            }
 
-          //Is Used for validate a valid file.
-          var uploadFile = document.getElementById("changephotobutton").files[0];
-          if (!filterType.test(uploadFile.type)) {
-            alert("Please select a valid image.");
-            return;
-          }
+            //Is Used for validate a valid file.
+            var uploadFile = document.getElementById("changephotobutton").files[0];
+            if (!filterType.test(uploadFile.type)) {
+                alert("Please select a valid image.");
+                return;
+            }
 
-          fileReader.readAsDataURL(uploadFile);
+            fileReader.readAsDataURL(uploadFile);
         }
     </script>
 {% endblock %}
