@@ -38,7 +38,7 @@ Session(app)
 # Configure CS50 Library to use SQLite database
 sqliteConnection = sqlite3.connect("./finance.db", check_same_thread=False)
 sqliteConnection.row_factory = sqlite3.Row
-db = sqliteConnection.cursor()
+
 
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
@@ -49,10 +49,11 @@ if not os.environ.get("API_KEY"):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    load_board = {"loads":[]}
+    load_board = {"loads": []}
     maxepoch = 32525679833000
     maxdh = 30000
     if len(request.args) > 1:
+        db = sqliteConnection.cursor()
         rows = db.execute(
             "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id "
             "where lot_id like ? AND "
@@ -67,25 +68,29 @@ def index():
             "rate <= ?;"
             , [
                 '%' + "" if str(request.args.get("lot_id")) == "NaN" else str(request.args.get("lot_id")) + '%'
-                , maxepoch if request.args.get("pickup") == "NaN" else int(request.args.get("pickup"))*1000
-                , maxepoch if request.args.get("delivery") == "NaN" else int(request.args.get("delivery"))*1000
+                , maxepoch if request.args.get("pickup") == "NaN" else int(request.args.get("pickup")) * 1000
+                , maxepoch if request.args.get("delivery") == "NaN" else int(request.args.get("delivery")) * 1000
                 , '%' + ("" if str(request.args.get("origin")) == "NaN" else str(request.args.get("origin"))) + '%'
                 , maxdh if request.args.get("dh-o") == "NaN" else request.args.get("dh-o")
-                , '%' + ("" if str(request.args.get("destination")) == "NaN" else str(request.args.get("destination"))) + '%'
+                , '%' + ("" if str(request.args.get("destination")) == "NaN" else str(
+                    request.args.get("destination"))) + '%'
                 , maxdh if request.args.get("dh-d") == "NaN" else request.args.get("dh-d")
                 , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
                 , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
                 , maxdh if request.args.get("weight") == "NaN" else request.args.get("weight")
                 , maxdh if request.args.get("rate") == "NaN" else request.args.get("rate")
-               ]
+            ]
         ).fetchall()
+        db.close()
     else:
-        rows = db.execute("SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id ;").fetchall()
+        db = sqliteConnection.cursor()
+        rows = db.execute(
+            "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id ;").fetchall()
+        db.close()
     for i in range(len(rows)):
         load_board["loads"].append(dict(rows[i]))
         load_board["loads"][i]["contact"] = {"tel": load_board["loads"][i]["tel"],
                                              "email": load_board["loads"][i]["email"]}
-    print(load_board)
     return render_template("index.html", loads=load_board)
 
 
@@ -175,7 +180,9 @@ def login():
             return apology("must provide password", 403)
 
         # Query database for username
+        db = sqliteConnection.cursor()
         rows = db.execute('SELECT * FROM users WHERE username = ?;', [request.form.get("username").lower()]).fetchall()
+        db.close()
 
         # Ensure username exists and password is correct
         if len(rows) != 1 or not check_password_hash(rows[0]["hash"], request.form.get("password")):
@@ -215,36 +222,68 @@ def changepassword():
 
         elif not request.form.get("confirmation"):
             return apology("must provide new password confirmation", 400)
-        user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"])
+        db = sqliteConnection.cursor()
+        user = db.execute("SELECT * FROM users WHERE id = ?", session["user_id"]).fetchone()
+        db.close()
         if not check_password_hash(user[0]["hash"], request.form.get("currentPassword")):
             return apology("invalid current password", 400)
         elif not request.form.get("newPassword") == request.form.get("confirmation"):
             return apology("password confirmation does not match", 400)
+        db = sqliteConnection.cursor()
         db.execute("UPDATE users SET hash = ? WHERE id = ?", generate_password_hash(
             request.form.get("newPassword"), "sha512", 8), session["user_id"])
+        db.close()
         return redirect("/")
     else:
+        db = sqliteConnection.cursor()
         user = dict(db.execute("SELECT * FROM users WHERE id = ?", [session["user_id"]]).fetchone())
-        user["photo"] = user["photo"].decode('utf-8-sig')
-        return render_template("changepassword.html",  user=user)
+        db.close()
+        # user["photo"] = user["photo"].decode('utf-8-sig')
+        return render_template("changepassword.html", user=user)
 
 
 @app.route("/profile", methods=["GET"])
 @login_required
 def profile():
-    user = dict(db.execute("SELECT * FROM users WHERE id = ?", [session["user_id"]]).fetchone())
-    user["photo"] = user["photo"].decode('utf-8-sig')
-    print(user["photo"])
+    db = sqliteConnection.cursor()
+    row = db.execute("SELECT * FROM users WHERE id = ?", [session["user_id"]]).fetchone()
+    user = dict(row)
+    db.close()
     return render_template("profile.html", user=user)
 
 
 @app.route("/profileedit", methods=["GET", "POST"])
 @login_required
 def profileedit():
-    user = dict(db.execute("SELECT * FROM users WHERE id = ?", [session["user_id"]]).fetchone())
-    user["photo"] = user["photo"].decode('utf-8-sig')
-    print(user["photo"])
-    return render_template("profileedit.html", user=user)
+    if request.method == "POST":
+        db = sqliteConnection.cursor()
+        db.execute("UPDATE users SET "
+                   "firstname = ?"
+                   ", lastname = ?"
+                   ", email = ?"
+                   ", phone = ?"
+                   ", bio = ?"
+                   ", photo = ?"
+                   "  WHERE id = ?", [
+                       request.form.get("firstname")
+                       , request.form.get("lastname")
+                       , request.form.get("email")
+                       , request.form.get("phone")
+                       , request.form.get("bio")
+                       , request.form.get("photo")
+                       , session["user_id"]
+                   ])
+        sqliteConnection.commit()
+        db.close()
+
+        return redirect("/profile")
+    else:
+        db = sqliteConnection.cursor()
+        row = db.execute("SELECT * FROM users WHERE id = ?", [session["user_id"]]).fetchone()
+        user = dict(row)
+        # user["photo"] = user["photo"].decode('utf-8-sig')
+        db.close()
+        return render_template("profileedit.html", user=user)
 
 
 @app.route("/quote", methods=["GET", "POST"])
@@ -286,14 +325,17 @@ def register():
         elif not request.form.get("confirmation") == request.form.get("password"):
             return apology("password and confirmation does not match", 400)
         # Query database for username
+        db = sqliteConnection.cursor()
         rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username").lower())
-
+        db.close()
         # Ensure username exists and password is correct
         if len(rows):
             return apology("username is not available", 400)
         password_hash = generate_password_hash(request.form.get("password"), "sha512", 8)
+        db = sqliteConnection.cursor()
         db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", request.form.get("username").lower(),
                    password_hash)
+        db.close()
         return render_template("success.html")
     # User reached route via GET (as by clicking a link or via redirect)
     else:
@@ -329,7 +371,8 @@ def sell():
                 "symbol").upper(), quoted["name"], float(request.form.get("shares")) * -1, quoted["price"])
         db.execute("UPDATE users SET cash = ? WHERE id = ?", cash[0]["cash"] +
                    quoted["price"] * float(request.form.get("shares")), session["user_id"])
-
+        sqliteConnection.commit()
+        db.close()
         return redirect("/")
     # User reached route via GET (as by clicking a link or via redirect)
     else:
