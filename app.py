@@ -1,3 +1,4 @@
+import arrow
 import os
 import sqlite3
 # from cs50 import SQL
@@ -39,7 +40,6 @@ Session(app)
 sqliteConnection = sqlite3.connect("./finance.db", check_same_thread=False)
 sqliteConnection.row_factory = sqlite3.Row
 
-
 # Make sure API key is set
 if not os.environ.get("API_KEY"):
     raise RuntimeError("API_KEY not set")
@@ -56,6 +56,7 @@ def index():
         db = sqliteConnection.cursor()
         rows = db.execute(
             "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id "
+            "join truck_type on truck_type.id = load_board.truck_type_id"
             "where lot_id like ? AND "
             "pickup <= ? AND "
             "delivery <= ? AND "
@@ -67,7 +68,7 @@ def index():
             "weight <= ? AND "
             "rate <= ?;"
             , [
-                '%' + "" if str(request.args.get("lot_id")) == "NaN" else str(request.args.get("lot_id")) + '%'
+                '%' + ("" if str(request.args.get("lot_id")) == "NaN" else str(request.args.get("lot_id"))) + '%'
                 , maxepoch if request.args.get("pickup") == "NaN" else int(request.args.get("pickup")) * 1000
                 , maxepoch if request.args.get("delivery") == "NaN" else int(request.args.get("delivery")) * 1000
                 , '%' + ("" if str(request.args.get("origin")) == "NaN" else str(request.args.get("origin"))) + '%'
@@ -85,7 +86,8 @@ def index():
     else:
         db = sqliteConnection.cursor()
         rows = db.execute(
-            "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id ;").fetchall()
+            "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id "
+            "join truck_type on truck_type.id = load_board.truck_type_id;").fetchall()
         db.close()
     for i in range(len(rows)):
         load_board["loads"].append(dict(rows[i]))
@@ -286,26 +288,64 @@ def profileedit():
         return render_template("profileedit.html", user=user)
 
 
-@app.route("/quote", methods=["GET", "POST"])
+@app.route("/new", methods=["GET", "POST"])
 @login_required
-def quote():
-    """Get stock quote."""
+def new():
+    """Add new load to the board"""
     if request.method == "POST":
-
-        # Ensure symbol was submitted
-        if not request.form.get("symbol").upper():
-            return apology("must provide symbol", 400)
-        if lookup(request.form.get("symbol").upper()) is None:
-            return apology("incorrect symbol", 400)
-        quoted = lookup(request.form.get("symbol").upper())
-        # return redirect("/quoted")
-
-        return render_template("quoted.html", name=quoted['name'], symbol=quoted['symbol'].upper(),
-                               price=quoted['price'])
+        pickup = arrow.get(request.form.get("pickup")).format('X') * 1000
+        delivery = arrow.get(request.form.get("delivery")).format('X') * 1000
+        db = sqliteConnection.cursor()
+        db.execute("INSERT INTO load_board ("
+                   "lot_id"
+                   ", truck_type_id"
+                   ", origin"
+                   ", dh_o"
+                   ", destination"
+                   ", dh_d"
+                   ", broker_id"
+                   ", carrier_id"
+                   ", weight"
+                   ", rate "
+                   ", pickup"
+                   ", delivery"
+                   ", users_id"
+                   ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
+                   ,[
+                   request.form.get("lotid")
+                   , request.form.get("type")
+                   , request.form.get("origin")
+                   , request.form.get("dho")
+                   , request.form.get("destination")
+                   , request.form.get("dhd")
+                   , request.form.get("broker")
+                   , request.form.get("carrier")
+                   , request.form.get("weight")
+                   , request.form.get("rate")
+                   , pickup
+                   , delivery
+                   , session["user_id"]
+                   ])
+        sqliteConnection.commit()
+        db.close()
+        return redirect("/")
 
     # User reached route via GET (as by clicking a link or via redirect)
     else:
-        return render_template("quote.html")
+        data = {}
+        db = sqliteConnection.cursor()
+        rows = db.execute("SELECT * FROM truck_type;").fetchall()
+        db.close()
+        data["types"] = rows
+        db = sqliteConnection.cursor()
+        rows = db.execute("SELECT * FROM companies where type = 1;").fetchall()
+        db.close()
+        data["brokers"] = rows
+        db = sqliteConnection.cursor()
+        rows = db.execute("SELECT * FROM companies where type = 2;").fetchall()
+        db.close()
+        data["carriers"] = rows
+        return render_template("new.html", data=data)
 
 
 @app.route("/register", methods=["GET", "POST"])

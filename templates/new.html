@@ -1,0 +1,106 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    New Load
+{% endblock %}
+
+{% block main %}
+
+    <div class="d-flex justify-content-center">
+        <div class="card mw-70 ">
+
+            <div class="card-body">
+                <form action="/new" method="post">
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="lotid">Lot ID</label>
+                            <input type="text" class="form-control" id="lotid" name="lotid">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="pickup">Pickup Date</label>
+                            <input type="date" class="form-control" id="pickup" name="pickup">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="delivery">Delivery Date</label>
+                            <input type="date" class="form-control" id="delivery" name="delivery">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="type">Select Type</label>
+                            <select id=type class="custom-select" name="type">
+                                <option selected>Truck Type</option>
+                                {% for type in data["types"] %}
+                                    <option value="{{ type["id"] }}">{{ type["long_name"] }}
+                                        ({{ type["short_name"] }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="origin">Origin</label>
+                            <input type="text" class="form-control query" id="origin" name="origin">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="dho">DH-O</label>
+                            <input type="number" class="form-control" id="dho" name="dho">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="destination">Destination</label>
+                            <input type="text" class="form-control query" id="destination" name="destination">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <label for="dho">HD-D</label>
+                            <input type="number" class="form-control" id="dhd" name="dhd">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="broker">Broker</label>
+
+                            <select id=broker class="custom-select" name="broker">
+                                <option selected>Select Broker</option>
+                                {% for broker in data["brokers"] %}
+                                    <option value="{{ broker["id"] }}">{{ broker["name"] }}
+                                        ({{ broker["mc"] }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="carrier">Carrier</label>
+                            <select id=carrier class="custom-select" name="carrier">
+                                <option selected>Select Carrier</option>
+                                {% for carrier in data["carriers"] %}
+                                    <option value="{{ carrier["id"] }}">{{ carrier["name"] }}
+                                        ({{ carrier["mc"] }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="weight">Weight</label>
+                            <input type="number" class="form-control" id="weight" name="weight">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="rate">Rate</label>
+                            <input type="number" class="form-control" id="rate" name="rate">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col text-center">
+                            <button type="submit" class="btn btn-primary">Add</button>
+                        </div>
+                    </div>
+
+
+                </form>
+            </div>
+        </div>
+    </div>
+    <script src="../static/googleplaces.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDoK-84VeozrxyMptNzx-lrVajABvd3oAM&libraries=places&callback=initMap&channel=GMPSB_addressselection_v1_cA"
+            async defer></script>
+{% endblock %}

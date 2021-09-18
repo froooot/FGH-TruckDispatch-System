@@ -18,24 +18,24 @@ nav .navbar-brand .black
     color: #101010;
 }
 
-main .form-control
-{
-    /* Center form controls */
-    display: inline-block;
+/*main .form-control*/
+/*{*/
+/*    !* Center form controls *!*/
+/*    display: inline-block;*/
 
-    /* Override Bootstrap's 100% width for form controls */
-    width: auto;
-}
+/*    !* Override Bootstrap's 100% width for form controls *!*/
+/*    width: auto;*/
+/*}*/
 
-main
-{
-    /* Scroll horizontally as needed */
-    overflow-x: auto;
+/*main*/
+/*{*/
+/*    !* Scroll horizontally as needed *!*/
+/*    overflow-x: auto;*/
 
-    /* Center contents */
-    text-align: center;
-    /*min-width: fit-content;*/
-}
+/*    !* Center contents *!*/
+/*    text-align: center;*/
+/*    !*min-width: fit-content;*!*/
+/*}*/
 
 main img
 {
@@ -63,20 +63,28 @@ th .th-inner{
     padding: 5px;
 
 }
-.search-input, .custom-select {
+.table .search-input, .table .custom-select {
     font-size: smaller
 }
 
-#lot_id, #pickup, #delivery{
+.table #lot_id, .table #pickup, .table #delivery{
     max-width:110px;
     font-size: smaller
 }
-#dh-d, #dh-o{
+.table #dh-d, .table #dh-o{
     max-width:60px;
 }
-#weight, #rate{
+.table #weight, .table #rate{
     max-width: 90px;
 }
 .card-body{
     min-height: 320px;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
 }

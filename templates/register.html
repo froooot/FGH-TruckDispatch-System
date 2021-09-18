@@ -5,16 +5,26 @@
 {% endblock %}
 
 {% block main %}
-    <form action="/register" method="post">
-        <div class="form-group">
-            <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text" required>
+    <div class="card col-md-4 mx-auto">
+        <div class="card-body">
+            <form action="/register" method="post">
+                <div class="form-group">
+                    <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username"
+                           type="text" required>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" name="password" placeholder="Password" type="password" required>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" name="confirmation" placeholder="Password (again)" type="password"
+                           required>
+                </div>
+                <div class="col text-center ">
+
+                    <button class="btn btn-primary" type="submit">Register</button>
+                </div>
+            </form>
         </div>
-        <div class="form-group">
-            <input class="form-control" name="password" placeholder="Password" type="password" required>
-        </div>
-        <div class="form-group">
-            <input class="form-control" name="confirmation" placeholder="Password (again)" type="password" required>
-        </div>
-        <button class="btn btn-primary" type="submit">Register</button>
-    </form>
+    </div>
+
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Portfolio
+    Load Board
 {% endblock %}
 
 {% block main %}
@@ -107,11 +107,11 @@
                     <td>{{load["lot_id"]}}</td>
                     <td>{{load["pickup"]|date}}</td>
                     <td>{{load["delivery"]|date}}</td>
-                    <td>{{load["truck_type"]}}</td>
+                    <td>{{load["short_name"]}}</td>
                     <td>{{load["origin"]}}</td>
-                    <td>{{load["dh-o"]}}</td>
+                    <td>{{load["dh_o"]}}</td>
                     <td>{{load["destination"]}}</td>
-                    <td>{{load["dh-d"]}}</td>
+                    <td>{{load["dh_d"]}}</td>
                     <td>{{load["contact"]["tel"]}}, {{load["contact"]["email"]}}</td>
                     <td>{{load["weight"]}}</td>
                     <td>{{load["rate"]|usd}}</td>
@@ -122,4 +122,4 @@
         </table>
     </div>
     <script src="../static/indexscript.js"></script>
-<script   src="https://code.jquery.com/jquery-3.6.0.js"   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="   crossorigin="anonymous"></script>{% endblock %}
+{% endblock %}
