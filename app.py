@@ -345,7 +345,7 @@ def new():
         rows = db.execute("SELECT * FROM companies where type = 2;").fetchall()
         db.close()
         data["carriers"] = rows
-        return render_template("new.html", data=data)
+        return render_template("new.html", data=data, key=os.environ.get("google_API_KEY"))
 
 
 @app.route("/register", methods=["GET", "POST"])
