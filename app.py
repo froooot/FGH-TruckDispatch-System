@@ -56,8 +56,8 @@ def index():
         db = sqliteConnection.cursor()
         rows = db.execute(
             "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id "
-            "join truck_type on truck_type.id = load_board.truck_type_id"
-            "where lot_id like ? AND "
+            "join truck_type on truck_type.id = load_board.truck_type_id where "
+            "lot_id like ? AND "
             "pickup <= ? AND "
             "delivery <= ? AND "
             "origin like ? AND "
@@ -293,8 +293,8 @@ def profileedit():
 def new():
     """Add new load to the board"""
     if request.method == "POST":
-        pickup = arrow.get(request.form.get("pickup")).format('X') * 1000
-        delivery = arrow.get(request.form.get("delivery")).format('X') * 1000
+        pickup = int(float(arrow.get(request.form.get("pickup")).format('X')) * 1000)
+        delivery = int(float(arrow.get(request.form.get("delivery")).format('X')) * 1000)
         db = sqliteConnection.cursor()
         db.execute("INSERT INTO load_board ("
                    "lot_id"
