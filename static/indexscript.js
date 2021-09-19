@@ -17,7 +17,8 @@ function filter() {
         "dh-d": $("#dh-d").val(),
         "contact": $("#contact").val(),
         "weight": $("#weight").val(),
-        "rate": $("#rate").val()
+        "rate": $("#rate").val(),
+        "type": $("#truck_type").val()
     }
     window.location = generateUrl("/", data);
     console.log(data)

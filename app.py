@@ -49,39 +49,42 @@ if not os.environ.get("API_KEY"):
 @login_required
 def index():
     """Show portfolio of stocks"""
-    load_board = {"loads": []}
+    load_board = {"loads": [], "truck_types":[]}
     maxepoch = 32525679833000
     maxdh = 30000
     if len(request.args) > 1:
+        query = ("SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id "
+                 "join truck_type on truck_type.id = load_board.truck_type_id where "
+                 "lot_id like ? AND "
+                 "pickup <= ? AND "
+                 "delivery <= ? AND "
+                 "origin like ? AND "
+                 "dh_o <= ? AND "
+                 "destination like ? AND "
+                 "dh_d <= ? AND "
+                 "(tel like ? OR email like ?) AND "
+                 "weight <= ? AND "
+                 "rate <= ?") + (";" if request.args.get("type") == '0' else " AND truck_type_id = ?;")
+        values = [
+            '%' + ("" if str(request.args.get("lot_id")) == "NaN" else str(request.args.get("lot_id"))) + '%'
+            , maxepoch if request.args.get("pickup") == "NaN" else int(request.args.get("pickup")) * 1000
+            , maxepoch if request.args.get("delivery") == "NaN" else int(request.args.get("delivery")) * 1000
+            , '%' + ("" if str(request.args.get("origin")) == "NaN" else str(request.args.get("origin"))) + '%'
+            , maxdh if request.args.get("dh-o") == "NaN" else request.args.get("dh-o")
+            , '%' + ("" if str(request.args.get("destination")) == "NaN" else str(
+                request.args.get("destination"))) + '%'
+            , maxdh if request.args.get("dh-d") == "NaN" else request.args.get("dh-d")
+            , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
+            , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
+            , maxdh if request.args.get("weight") == "NaN" else request.args.get("weight")
+            , maxdh if request.args.get("rate") == "NaN" else request.args.get("rate")
+        ]
+        if request.args.get("type") != '0':
+            values.append(request.args.get("type"))
+        print(query)
+        print(values)
         db = sqliteConnection.cursor()
-        rows = db.execute(
-            "SELECT * FROM load_board JOIN companies on load_board.carrier_id = companies.id "
-            "join truck_type on truck_type.id = load_board.truck_type_id where "
-            "lot_id like ? AND "
-            "pickup <= ? AND "
-            "delivery <= ? AND "
-            "origin like ? AND "
-            "dh_o <= ? AND "
-            "destination like ? AND "
-            "dh_d <= ? AND "
-            "(tel like ? OR email like ?) AND "
-            "weight <= ? AND "
-            "rate <= ?;"
-            , [
-                '%' + ("" if str(request.args.get("lot_id")) == "NaN" else str(request.args.get("lot_id"))) + '%'
-                , maxepoch if request.args.get("pickup") == "NaN" else int(request.args.get("pickup")) * 1000
-                , maxepoch if request.args.get("delivery") == "NaN" else int(request.args.get("delivery")) * 1000
-                , '%' + ("" if str(request.args.get("origin")) == "NaN" else str(request.args.get("origin"))) + '%'
-                , maxdh if request.args.get("dh-o") == "NaN" else request.args.get("dh-o")
-                , '%' + ("" if str(request.args.get("destination")) == "NaN" else str(
-                    request.args.get("destination"))) + '%'
-                , maxdh if request.args.get("dh-d") == "NaN" else request.args.get("dh-d")
-                , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
-                , '%' + ("" if str(request.args.get("contact")) == "NaN" else str(request.args.get("contact"))) + '%'
-                , maxdh if request.args.get("weight") == "NaN" else request.args.get("weight")
-                , maxdh if request.args.get("rate") == "NaN" else request.args.get("rate")
-            ]
-        ).fetchall()
+        rows = db.execute(query, values).fetchall()
         db.close()
     else:
         db = sqliteConnection.cursor()
@@ -93,6 +96,12 @@ def index():
         load_board["loads"].append(dict(rows[i]))
         load_board["loads"][i]["contact"] = {"tel": load_board["loads"][i]["tel"],
                                              "email": load_board["loads"][i]["email"]}
+    db = sqliteConnection.cursor()
+    rows = db.execute(
+        "SELECT * FROM truck_type;").fetchall()
+    db.close()
+    for i in range(len(rows)):
+        load_board["truck_types"].append(dict(rows[i]))
     return render_template("index.html", loads=load_board)
 
 
@@ -311,20 +320,20 @@ def new():
                    ", delivery"
                    ", users_id"
                    ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);"
-                   ,[
-                   request.form.get("lotid")
-                   , request.form.get("type")
-                   , request.form.get("origin")
-                   , request.form.get("dho")
-                   , request.form.get("destination")
-                   , request.form.get("dhd")
-                   , request.form.get("broker")
-                   , request.form.get("carrier")
-                   , request.form.get("weight")
-                   , request.form.get("rate")
-                   , pickup
-                   , delivery
-                   , session["user_id"]
+                   , [
+                       request.form.get("lotid")
+                       , request.form.get("type")
+                       , request.form.get("origin")
+                       , request.form.get("dho")
+                       , request.form.get("destination")
+                       , request.form.get("dhd")
+                       , request.form.get("broker")
+                       , request.form.get("carrier")
+                       , request.form.get("weight")
+                       , request.form.get("rate")
+                       , pickup
+                       , delivery
+                       , session["user_id"]
                    ])
         sqliteConnection.commit()
         db.close()

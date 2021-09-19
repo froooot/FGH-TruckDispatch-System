@@ -69,7 +69,7 @@
                         </div>
                         <div class="form-group col-md-6">
                             <label for="carrier">Carrier</label>
-                            <select id=carrier class="custom-select" name="carrier">
+                            <select id=carrier class="custom-select " name="carrier">
                                 <option selected>Select Carrier</option>
                                 {% for carrier in data["carriers"] %}
                                     <option value="{{ carrier["id"] }}">{{ carrier["name"] }}
