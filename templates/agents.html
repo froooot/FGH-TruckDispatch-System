@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Agents
+{% endblock %}
+
+{% block main %}
+    <div class="row justify-content-center">
+        <div class="col-auto">
+            <table class="table table-responsive table-striped text-xsmall">
+                <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Phone
+                    </th>
+                    <th>
+                        Email
+                    </th>
+                    <th>
+                        Number of Lots
+                    </th>
+                    <th>
+                        Total Sum
+                    </th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for agent in agents %}
+                    <tr>
+                        <td>{{ agent["name"] }}</td>
+                        <td>{{ agent["phone"] }}</td>
+                        <td>{{ agent["email"] }}</td>
+                        <td>{{ agent["totalnum"] }}</td>
+                        <td>{{ agent["totalsum"] }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

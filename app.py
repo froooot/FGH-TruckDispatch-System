@@ -105,71 +105,41 @@ def index():
     return render_template("index.html", loads=load_board)
 
 
-@app.route("/buy", methods=["GET", "POST"])
+@app.route("/agents", methods=["GET"])
 @login_required
-def buy():
-    """Buy shares of stock"""
+def agents():
+    db = sqliteConnection.cursor()
+    agents = db.execute(
+        """select (firstname || " " || lastname) as name
+     , phone
+     , email
+     , sum(rate)                      as totalsum
+     , count(lot_id)                  as totalnum
+from users
+         join load_board lb on users.id = lb.users_id
+group by (firstname || " " || lastname);""").fetchall()
+    db.close()
+    return render_template("agents.html", agents=agents)
+
+
+@app.route("/newcarrier", methods=["GET", "POST"])
+@login_required
+def newcarrier():
+
     if request.method == "POST":
-
-        # Ensure symbol was submitted
-        if not request.form.get("symbol").upper():
-            return apology("must provide symbol", 400)
-        quoted = lookup(request.form.get("symbol").upper())
-        if not request.form.get("shares"):
-            return apology("must provide shares number", 400)
-        if lookup(request.form.get("symbol").upper()) is None:
-            return apology("incorrect symbol", 400)
-        quoted = lookup(request.form.get("symbol").upper())
-        budget = db.execute("SELECT cash FROM users WHERE id = ?", [session["user_id"]])
-        if not request.form.get("shares").isnumeric():
-            return apology("shares can not be fractional, negative or and non-numericl", 400)
-        if not float(request.form.get("shares")) > 0 or float(request.form.get("shares")) % 10 == 0:
-            return apology("shares can not be fractional, negative or and non-numericl", 400)
-        if float(request.form.get("shares")) * quoted["price"] <= budget[0]["cash"]:
-            db.execute("INSERT INTO transactions (users_id, symbol, name, shares, price) VALUES (?, ?, ?, ?, ?)",
-                       [session["user_id"], request.form.get(
-                           "symbol").upper(), quoted["name"], float(request.form.get("shares")), quoted["price"]])
-            db.execute("UPDATE users SET cash = ? WHERE id = ?",
-                       budget[0]["cash"] - (float(request.form.get("shares")) * quoted["price"]), session["user_id"])
-        else:
-            return apology("not enough funds", 400)
-
-        # return redirect("/")
-        return redirect("/")
-
-    # User reached route via GET (as by clicking a link or via redirect)
+        return render_template("newcarrier.html")
     else:
-        return render_template("buy.html")
+        return render_template("newcarrier.html")
 
 
-@app.route("/addcash", methods=["GET", "POST"])
+@app.route("/newbroker", methods=["GET", "POST"])
 @login_required
-def addcash():
-    """Buy shares of stock"""
+def newbroker():
+
     if request.method == "POST":
-        # Ensure symbol was submitted
-        if not request.form.get("amount"):
-            return apology("must provide amount", 400)
-        if not request.form.get("amount").isnumeric():
-            return apology("amount can not be non-numericl", 400)
-        if not float(request.form.get("amount")) > 0:
-            return apology("amount can not be negative", 400)
-        budget = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
-        db.execute("UPDATE users SET cash = ? WHERE id = ?",
-                   budget[0]["cash"] + float(request.form.get("amount")), session["user_id"])
-        return redirect("/")
-
-    # User reached route via GET (as by clicking a link or via redirect)
+        return render_template("newbroker.html")
     else:
-        return render_template("addcash.html")
-
-
-@app.route("/history")
-@login_required
-def history():
-    """Show history of transactions"""
-    history = db.execute("SELECT * FROM transactions WHERE users_id = ? order by timestamp DESC", session["user_id"])
-    return render_template("history.html", history=history)
+        return render_template("newbroker.html")
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -389,44 +359,6 @@ def register():
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
-
-
-@app.route("/sell", methods=["GET", "POST"])
-@login_required
-def sell():
-    """Sell shares of stock"""
-    portfolio = db.execute(
-        "SELECT symbol, name, sum(shares) as shares FROM transactions WHERE users_id = ? group by symbol",
-        session["user_id"])
-    cash = db.execute("SELECT cash FROM users WHERE id = ?", session["user_id"])
-    availableSymbols = []
-    if request.method == "POST":
-
-        # Ensure symbol was submitted
-        if not request.form.get("symbol").upper():
-            return apology("must provide symbol", 400)
-        for symbol in portfolio:
-            availableSymbols.append(symbol["symbol"])
-        if request.form.get("symbol").upper() not in availableSymbols:
-            return apology("incorrect symbol", 400)
-        if not request.form.get("shares"):
-            return apology("must provide number of shares", 400)
-        stock = next((item for item in portfolio if item['symbol'] == request.form.get("symbol").upper()), None)
-        if stock["shares"] - float(request.form.get("shares")) < 0:
-            return apology("don't have enough shares", 400)
-        quoted = lookup(request.form.get("symbol").upper())
-        db.execute("INSERT INTO transactions (users_id, symbol, name, shares, price) VALUES (?, ?, ?, ?, ?)",
-                   session["user_id"], request.form.get(
-                "symbol").upper(), quoted["name"], float(request.form.get("shares")) * -1, quoted["price"])
-        db.execute("UPDATE users SET cash = ? WHERE id = ?", cash[0]["cash"] +
-                   quoted["price"] * float(request.form.get("shares")), session["user_id"])
-        sqliteConnection.commit()
-        db.close()
-        return redirect("/")
-    # User reached route via GET (as by clicking a link or via redirect)
-    else:
-
-        return render_template("sell.html", symbols=portfolio)
 
 
 def errorhandler(e):
