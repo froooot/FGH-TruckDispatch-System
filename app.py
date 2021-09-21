@@ -41,15 +41,15 @@ sqliteConnection = sqlite3.connect("./finance.db", check_same_thread=False)
 sqliteConnection.row_factory = sqlite3.Row
 
 # Make sure API key is set
-if not os.environ.get("API_KEY"):
-    raise RuntimeError("API_KEY not set")
+# if not os.environ.get("API_KEY"):
+#     raise RuntimeError("API_KEY not set")
 
 
 @app.route("/")
 @login_required
 def index():
     """Show portfolio of stocks"""
-    load_board = {"loads": [], "truck_types":[]}
+    load_board = {"loads": [], "truck_types": []}
     maxepoch = 32525679833000
     maxdh = 30000
     if len(request.args) > 1:
@@ -125,21 +125,79 @@ group by (firstname || " " || lastname);""").fetchall()
 @app.route("/newcarrier", methods=["GET", "POST"])
 @login_required
 def newcarrier():
-
+    title = "New Carrier"
     if request.method == "POST":
-        return render_template("newcarrier.html")
+        if not request.form.get("name") and \
+                request.form.get("address") and \
+                request.form.get("tel") and \
+                request.form.get("email") and \
+                request.form.get("mc"):
+            return apology("Please fill required fields", 403)
+        sql = """
+        INSERT INTO companies (
+        name
+        , address
+        , tel
+        , email
+        , mc
+        , comment
+        , type
+        ) VALUES (?, ?, ?, ?, ?, ?, 2);
+        """
+        values = [
+            request.form.get("name")
+            , request.form.get("address")
+            , request.form.get("tel")
+            , request.form.get("email")
+            , request.form.get("mc")
+            , request.form.get("comment")
+        ]
+        db = sqliteConnection.cursor()
+        db.execute(sql, values)
+        sqliteConnection.commit()
+        db.close()
+        return redirect("/")
     else:
-        return render_template("newcarrier.html")
+        return render_template("newcompany.html", title = title)
 
 
 @app.route("/newbroker", methods=["GET", "POST"])
 @login_required
 def newbroker():
-
+    title = "New Broker"
     if request.method == "POST":
-        return render_template("newbroker.html")
+        if not request.form.get("name") and \
+                request.form.get("address") and \
+                request.form.get("tel") and \
+                request.form.get("email") and \
+                request.form.get("mc"):
+            return apology("Please fill required fields", 403)
+        sql = """
+        INSERT INTO companies (
+        name
+        , address
+        , tel
+        , email
+        , mc
+        , comment
+        , type
+        ) VALUES (?, ?, ?, ?, ?, ?, 1);
+        """
+        values = [
+            request.form.get("name")
+            , request.form.get("address")
+            , request.form.get("tel")
+            , request.form.get("email")
+            , request.form.get("mc")
+            , request.form.get("comment")
+        ]
+        db = sqliteConnection.cursor()
+        db.execute(sql, values)
+        sqliteConnection.commit()
+        db.close()
+        return redirect("/")
     else:
-        return render_template("newbroker.html")
+        return render_template("newcompany.html", title=title)
 
 
 @app.route("/login", methods=["GET", "POST"])

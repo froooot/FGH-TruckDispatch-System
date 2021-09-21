@@ -50,10 +50,10 @@ table tfoot{
 
 }
 table thead{
-    font-size: 12px;
+    font-size: 16px;
 }
 table tbody{
-    font-size: 11px;
+    font-size: 14px;
 }
 
 th .th-inner{
