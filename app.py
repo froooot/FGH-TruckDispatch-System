@@ -403,17 +403,17 @@ def register():
             return apology("password and confirmation does not match", 400)
         # Query database for username
         db = sqliteConnection.cursor()
-        rows = db.execute("SELECT * FROM users WHERE username = ?", request.form.get("username").lower())
+        rows = db.execute('SELECT * FROM users WHERE username = ?;', [request.form.get("username").lower()]).fetchall()
         db.close()
         # Ensure username exists and password is correct
         if len(rows):
             return apology("username is not available", 400)
         password_hash = generate_password_hash(request.form.get("password"), "sha512", 8)
         db = sqliteConnection.cursor()
-        db.execute("INSERT INTO users (username, hash) VALUES (?, ?)", request.form.get("username").lower(),
-                   password_hash)
+        db.execute('INSERT INTO users (username, hash) VALUES (?, ?)', [request.form.get("username").lower(),
+                   password_hash])
         db.close()
-        return render_template("success.html")
+        return render_template("success.html")("must provide username", 400)
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
