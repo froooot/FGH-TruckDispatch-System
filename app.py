@@ -413,7 +413,7 @@ def register():
         db.execute('INSERT INTO users (username, hash) VALUES (?, ?)', [request.form.get("username").lower(),
                    password_hash])
         db.close()
-        return render_template("success.html")("must provide username", 400)
+        return render_template("success.html")
     # User reached route via GET (as by clicking a link or via redirect)
     else:
         return render_template("register.html")
